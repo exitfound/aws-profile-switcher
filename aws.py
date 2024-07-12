@@ -1,6 +1,7 @@
 import argparse
 import json
 import shutil
+import sys
 import os.path
 from os.path import expanduser
 
@@ -14,16 +15,16 @@ parser.add_argument('-o', '--original', nargs='?', const=expanduser("~")+"/.aws/
 parser.add_argument('-l', '--list', action='store_true', help="Displaying all existing AWS profiles")
 arguments = parser.parse_args()
 
-originalProfiles = (expanduser("~")+"/.aws/credentials")
-jsonProfiles = arguments.json_path
-profilesExist = os.path.exists(jsonProfiles)
+original_profiles = (expanduser("~")+"/.aws/credentials")
+json_profiles = arguments.json_path
+profiles_exist = os.path.exists(json_profiles)
 
 if arguments.original:
     try:
-        shutil.copy2(originalProfiles, arguments.original)
+        shutil.copy2(original_profiles, arguments.original)
     except FileNotFoundError:
-        print(f"{originalProfiles} already saved or does not exist.")
-    exit(0)
+        print(f"{original_profiles} already saved or does not exist.")
+    sys.exit()
 
 profiles_file_name = ""
 
@@ -35,18 +36,18 @@ elif arguments.generate_append:
 
 if arguments.generate or arguments.generate_append:
     if arguments.generate:
-        dataGenerate={}
-        dataGenerate['profiles'] = []
+        data_generate={}
+        data_generate['profiles'] = []
 
     elif arguments.generate_append:
         with open(profiles_file_name, "r") as append:
-            dataGenerate = json.load(append)
+            data_generate = json.load(append)
 
     while True:
         aws_name = input("Enter the profile name: ")
         aws_access = input("Enter the access key: ")
         aws_secret = input("Enter the secret key: ")
-        dataGenerate['profiles'].append({
+        data_generate['profiles'].append({
             "name": aws_name,
             "aws_access_key": aws_access,
             "aws_secret_key": aws_secret
@@ -66,21 +67,21 @@ if arguments.generate or arguments.generate_append:
 
     print(profiles_file_name)
     with open(profiles_file_name,'w') as file:
-        json.dump(dataGenerate,file,indent=4)
-    exit(0)
+        json.dump(data_generate,file,indent=4)
+    sys.exit()
 
-if profilesExist != True:
-    print("The file on the path", jsonProfiles, "was not found. Generate or add it manually!")
-    exit(0)
+if profiles_exist != True:
+    print("The file on the path", json_profiles, "was not found. Generate or add it manually!")
+    sys.exit()
 
-openProfiles = open(jsonProfiles, "r")
-readData = openProfiles.read()
-data = json.loads(readData)
+open_profiles = open(json_profiles, "r")
+read_data = open_profiles.read()
+data = json.loads(read_data)
 
 if arguments.list:
     for list in data['profiles']:
         print(f"[{list['name']}]\naws_access_key = {list['aws_access_key']}\naws_secret_key = {list['aws_secret_key']}\n")
-    exit(0)
+    sys.exit()
 
 for value in data['profiles']:
     if arguments.profile == value["name"]:
