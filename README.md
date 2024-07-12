@@ -47,11 +47,16 @@ python3 aws.py -h
 Данный метод основан на упаковке Python-скрипта в бинарный файл с помощью инструмента `Pyinstaller`. Является наиболее удобным и предпочтительным вариантом. Сам бинарник хранится в релизе. Чтобы начать работу с бинарной версией необходимо выполнить следующую последовательность команд:
 
 ```
-wget $(wget -q -O - https://api.github.com/repos/exitfound/aws-profile-switcher/releases/latest | jq -r '.assets[] | select(.name | contains ("aps.zip")) | .browser_download_url')
-unzip aps.zip
-sudo chmod +x aps
+wget $(wget -q -O - https://api.github.com/repos/exitfound/aws-profile-switcher/releases/latest | jq -r '.assets[] | select(.name | contains ("aps")) | .browser_download_url')
+unzip aps_linux_amd64.zip
 sudo mv aps /usr/local/bin/
 aps -h
+```
+
+Примечание: Альтернативный путь, чтобы забрать с помощью `wget`:
+
+```
+wget https://github.com/exitfound/aws-profile-switcher/releases/latest/download/aps_linux_amd64.zip
 ```
 
 ### **С помощью Docker:**
@@ -165,4 +170,13 @@ python3 aws.py -j [путь_к_JSON_файлу] -p [имя_профиля]
 
 ```
 python3 aws.py -d [путь_к_JSON_файлу (опционально)]
+```
+
+## Бинарная сборка:
+
+Если есть потребность в самостоятельной сборке бинарного файла, то можно воспользоваться следующей командой:
+
+```
+pip3 install pyinstaller
+pyinstaller --onefile --noconfirm --clean --name aps aws.py
 ```
