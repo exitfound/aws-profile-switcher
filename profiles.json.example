@@ -1,0 +1,24 @@
+{
+    "profiles": [
+        {
+            "name": "medoed",
+            "aws_access_key": "access_key",
+            "aws_secret_key": "secret_key"
+        },
+        {
+            "name": "dvp",
+            "aws_access_key": "access_key",
+            "aws_secret_key": "secret_key"
+        },
+        {
+            "name": "limbo",
+            "aws_access_key": "access_key",
+            "aws_secret_key": "secret_key"
+        },
+        {
+            "name": "tesla",
+            "aws_access_key": "access_key",
+            "aws_secret_key": "secret_key"
+        }
+    ]
+}
