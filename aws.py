@@ -82,19 +82,16 @@ read_data = open_profiles.read()
 data = json.loads(read_data)
 
 if arguments.delete_profile:
-    is_deleted = False
     for element in data['profiles']:
-        if element['name'] == arguments.delete_profile:
+        if arguments.delete_profile in element['name']:
             data['profiles'].remove(element)
             print("The AWS profile with name", arguments.delete_profile, "has been successfully deleted.")
-            is_deleted = True
             break
+    else:
+        print("The AWS profile with name", arguments.delete_profile, "is not found.")
 
     with open(json_profiles, 'w') as file:
         file.write(json.dumps(data, indent=4))
-
-    if is_deleted == False:
-        print("The AWS profile with name", arguments.delete_profile, "is not found.")
     sys.exit()
 
 if arguments.list:
