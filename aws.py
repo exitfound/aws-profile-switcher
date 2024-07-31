@@ -11,7 +11,7 @@ parser.add_argument('-a', '--profile_path', type=str, default=expanduser("~")+"/
 parser.add_argument('-j', '--json_path', type=str, default=expanduser("~")+"/.aws/profiles.json", help="Input path to the AWS profiles generated file in JSON format.")
 parser.add_argument('-g', '--generate', nargs='?', const=expanduser("~")+"/.aws/profiles.json", help="Generate a JSON file for the application to run")
 parser.add_argument('-e', '--append_profile', nargs='?', const=expanduser("~")+"/.aws/profiles.json", help="Append a new profile to JSON file")
-parser.add_argument('-d', '--delete_profile', type=str, help="Removing an existing profile from a JSON file")
+parser.add_argument('-d', '--delete_profile', type=str, help="Remove an existing profile from a JSON file")
 parser.add_argument('-o', '--original', nargs='?', const=expanduser("~")+"/.aws/credentials.original", help="Saving the original AWS credential file")
 parser.add_argument('-l', '--list', action='store_true', help="Displaying all existing AWS profiles")
 arguments = parser.parse_args()
