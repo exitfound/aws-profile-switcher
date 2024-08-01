@@ -92,6 +92,7 @@ jobs:
       - name: Create Release on Github
         uses: softprops/action-gh-release@v2
         with:
+          body_path: "Some test"
           files: ${{ github.ref_name }}-CHANGELOG.txt
           repository: exitfound/aws-profile-switcher
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
