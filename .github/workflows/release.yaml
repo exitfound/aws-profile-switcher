@@ -61,7 +61,7 @@
 #         with:
 #           id: ${{ steps.create_release.outputs.id }}
 
-name: Main
+name: Create Release
 
 on: 
   push:
@@ -88,9 +88,10 @@ jobs:
         run: pyinstaller --onefile --noconfirm --clean --name aps aws.py
 
       - name: Generate Changelog
-        run: echo "# Good things have arrived" > ${{ github.workspace }}-CHANGELOG.txt
+        run: echo "# Good things have arrived" > ${{ github.ref_name }}-CHANGELOG.txt
 
-      - name: Release
+      # https://github.com/softprops/action-gh-release
+      - name: Create Release on Github
         uses: softprops/action-gh-release@v2
         with:
           body_path: ${{ github.workspace }}-CHANGELOG.txt
