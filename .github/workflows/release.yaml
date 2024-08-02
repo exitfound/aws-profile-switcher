@@ -35,4 +35,4 @@ jobs:
           repository: exitfound/aws-profile-switcher
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           body_path: ${{ github.ref_name }}.txt
-          files: aps_linux_amd64.zip
+          files: ./dist/aps_linux_amd64.zip
