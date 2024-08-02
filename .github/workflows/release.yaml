@@ -22,7 +22,8 @@ jobs:
       - name: Build our application
         run: |
           pyinstaller --onefile --noconfirm --clean --name aps aws.py \
-          && zip aps_linux_amd64.zip ./dist/aps
+          && cd ./dist/ \
+          && zip aps_linux_amd64.zip aps
 
       - name: Generate Date for Body 
         run: echo "# $(date +'%Y/%m/%d')" > ${{ github.ref_name }}.txt
