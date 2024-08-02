@@ -25,7 +25,7 @@ jobs:
           && zip aps.zip ./dist/aps
 
       - name: Generate Date for Body 
-        run: echo "# $(date +'%Y/%m/%d')" > ${{ github.ref_name }}.txt
+        run: echo "# $(date +'%Y/%m/%d')" > ${{ github.event.release.tag_name }}.txt
 
       # https://github.com/softprops/action-gh-release
       - name: Create Release on Github
