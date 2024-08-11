@@ -1,8 +1,7 @@
 import argparse
 import json
-import sys
-import os.path
 from shutil import copy2
+from os.path import exists
 from os.path import expanduser
 
 credential_file_path = (expanduser("~") + "/.aws/credentials")
@@ -15,40 +14,22 @@ parser.add_argument('-j', '--json_path', type=str, default=profile_file_path, he
 parser.add_argument('-g', '--generate', nargs='?', const=profile_file_path, help="Generate a JSON file for the application to run")
 parser.add_argument('-e', '--append_profile', nargs='?', const=profile_file_path, help="Append a new profile to JSON file")
 parser.add_argument('-d', '--delete_profile', type=str, help="Remove an existing profile from a JSON file")
-parser.add_argument('-o', '--original', nargs='?', const=expanduser("~")+"/.aws/credentials.original", help="Save the original AWS credential file")
+parser.add_argument('-o', '--original', nargs='?', const=credential_file_path + ".original", help="Save the original AWS credential file")
 parser.add_argument('-l', '--list', action='store_true', help="Display all existing AWS profiles")
 
 arguments = parser.parse_args()
 json_profiles = arguments.json_path
-profiles_exist = os.path.exists(json_profiles)
+profiles_exist = exists(json_profiles)
 
 def original_save():
     try:
+        open(credential_file_path, 'r')
         copy2(credential_file_path, arguments.original)
-    except:
-        raise SystemExit(f"The file {credential_file_path} does not exist or has already been saved.")
 
-if arguments.original:
-    original_save()
-    sys.exit()
+    except FileNotFoundError as error:
+        print(f"The requested file was not found: \n\n {error}")
 
-profiles_file_name = ""
-
-if arguments.generate:
-    profiles_file_name = arguments.generate
-
-elif arguments.append_profile:
-    profiles_file_name = arguments.append_profile
-
-if arguments.generate or arguments.append_profile:
-    if arguments.generate:
-        data_generate={}
-        data_generate['profiles'] = []
-
-    elif arguments.append_profile:
-        with open(profiles_file_name, "r") as append:
-            data_generate = json.load(append)
-
+def profile_create(profiles_file_name, data_generate):
     while True:
         aws_name = input("Enter the profile name: ")
         aws_access = input("Enter the access key: ")
@@ -62,54 +43,71 @@ if arguments.generate or arguments.append_profile:
         break_from_cycle = False
 
         while True:
-            quit=input("\nEnter Y/N to continue: ")
-            if quit.lower() == 'n':
+            repeat=input("\nEnter Y/N to continue: ")
+            if repeat.lower() == 'n':
                 break_from_cycle = True
                 break
-            if quit.lower() == 'y':
+            if repeat.lower() == 'y':
                 break
         if break_from_cycle is True:
             break
 
-    with open(profiles_file_name,'w') as file:
-        json.dump(data_generate,file,indent=4)
-    sys.exit()
+    with open(profiles_file_name, 'w') as data:
+        json.dump(data_generate, data, indent=4)
 
-if profiles_exist != True:
-    print("The file on the path", json_profiles, "was not found. Generate or add it manually!")
-    sys.exit()
+def main():
 
-open_profiles = open(json_profiles, "r")
-read_data = open_profiles.read()
-data = json.loads(read_data)
+    if arguments.original:
+        original_save()
+        return
 
-if arguments.delete_profile:
-    is_deleted = False
-    for element in data['profiles']:
-        if element['name'] == arguments.delete_profile:
-            data['profiles'].remove(element)
-            print("The AWS profile with name", arguments.delete_profile, "has been successfully deleted.")
-            is_deleted = True
-            break
+    elif arguments.generate:
+        data_generate = {'profiles': []}
+        profiles_file_name = arguments.generate
+        profile_create(profiles_file_name, data_generate)
+        return
 
-    with open(json_profiles, 'w') as file:
-        file.write(json.dumps(data, indent=4))
+    elif arguments.append_profile:
+        profiles_file_name = arguments.append_profile
+        with open(profiles_file_name, "r") as append:
+            data_generate = json.load(append)
+        profile_create(profiles_file_name, data_generate)
+        return
 
-    if is_deleted == False:
-        print("The AWS profile with name", arguments.delete_profile, "is not found.")
-    sys.exit()
+    elif not profiles_exist:
+        print("The file on the path", json_profiles, "was not found. Generate or add it manually!")
+        return
 
-if arguments.list:
-    for list in data['profiles']:
-        print(f"[{list['name']}]\naws_access_key = {list['aws_access_key']}\naws_secret_key = {list['aws_secret_key']}\n")
-    sys.exit()
+    open_profiles = open(json_profiles, "r")
+    read_data = open_profiles.read()
+    data = json.loads(read_data)
 
-for value in data['profiles']:
-    if arguments.profile == value["name"]:
-        with open(arguments.profile_path, "w") as file:
-            file.write(f"# Current profile is {value['name']}\n[default]\naws_access_key = {value['aws_access_key']}\naws_secret_key = {value['aws_secret_key']}\n")
-            print("The AWS profile with name", arguments.profile, "has been successfully uploaded.\n")
-        break
+    if arguments.delete_profile:
+        for value in data['profiles']:
+            if value['name'] == arguments.delete_profile:
+                data['profiles'].remove(value)
+                print("The AWS profile with name", arguments.delete_profile, "has been successfully deleted.")
+                break
+        else:
+            print("The AWS profile with name", arguments.delete_profile, "is not found.")
 
-else:
-    print("The AWS profile with name", arguments.profile, "is not found.\n")
+        with open(json_profiles, 'w') as file:
+            file.write(json.dumps(data, indent=4))
+
+    elif arguments.list:
+        for value in data['profiles']:
+            print(f"[{value['name']}]\naws_access_key = {value['aws_access_key']}\naws_secret_key = {value['aws_secret_key']}\n")
+
+    elif arguments.profile:
+        for value in data['profiles']:
+            if arguments.profile == value["name"]:
+                with open(arguments.profile_path, "w") as file:
+                    file.write(f"# Current profile is {value['name']}\n[default]\naws_access_key = {value['aws_access_key']}\naws_secret_key = {value['aws_secret_key']}\n")
+                    print("The AWS profile with name", arguments.profile, "has been successfully uploaded.\n")
+                break
+
+        else:
+            print("The AWS profile with name", arguments.profile, "is not found.\n")
+
+if __name__ == "__main__":
+    main()
