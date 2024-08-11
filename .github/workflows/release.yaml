@@ -25,7 +25,8 @@ jobs:
           && cd ./dist/ \
           && du -sh . \
           && zip aps_linux_amd64.zip aps \
-          && du -sh .
+          && du -sh . \
+          && ls -la
 
       - name: Generate Date for Body
         run: echo "# $(date +'%Y/%m/%d')" > ${{ github.ref_name }}.txt
