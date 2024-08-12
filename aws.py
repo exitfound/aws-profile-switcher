@@ -61,20 +61,20 @@ def main():
         original_save()
         return
 
-    elif arguments.generate:
+    if arguments.generate:
         data_generate = {'profiles': []}
         profiles_file_name = arguments.generate
         profile_create(profiles_file_name, data_generate)
         return
 
-    elif arguments.append_profile:
+    if arguments.append_profile:
         profiles_file_name = arguments.append_profile
         with open(profiles_file_name, "r") as append:
             data_generate = json.load(append)
         profile_create(profiles_file_name, data_generate)
         return
 
-    elif not profiles_exist:
+    if not profiles_exist:
         print("The file on the path", json_profiles, "was not found. Generate or add it manually!")
         return
 
@@ -94,15 +94,16 @@ def main():
         with open(json_profiles, 'w') as file:
             file.write(json.dumps(data, indent=4))
 
-    elif arguments.list:
+    if arguments.list:
         for value in data['profiles']:
             print(f"[{value['name']}]\naws_access_key = {value['aws_access_key']}\naws_secret_key = {value['aws_secret_key']}\n")
 
-    elif arguments.profile:
+    if arguments.profile:
         for value in data['profiles']:
             if arguments.profile == value["name"]:
                 with open(arguments.profile_path, "w") as file:
-                    file.write(f"# Current profile is {value['name']}\n[default]\naws_access_key = {value['aws_access_key']}\naws_secret_key = {value['aws_secret_key']}\n")
+                    file.write(f"# Current profile is {value['name']}\n[default]\naws_access_key = {value['aws_access_key']}\n" \
+                               f"aws_secret_key = {value['aws_secret_key']}\n")
                     print("The AWS profile with name", arguments.profile, "has been successfully uploaded.\n")
                 break
 
