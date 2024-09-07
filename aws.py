@@ -4,6 +4,7 @@ from shutil import copy2
 from os.path import exists
 from os.path import expanduser
 
+AWS_TEXT = "The AWS profile with name"
 credential_file_path = (expanduser("~") + "/.aws/credentials")
 profile_file_path = (expanduser("~") + "/.aws/profiles.json")
 
@@ -86,10 +87,10 @@ def main():
         for value in data['profiles']:
             if value['name'] == arguments.delete_profile:
                 data['profiles'].remove(value)
-                print("The AWS profile with name", arguments.delete_profile, "has been successfully deleted.")
+                print(f"{AWS_TEXT}", arguments.delete_profile, "has been successfully deleted.")
                 break
         else:
-            print("The AWS profile with name", arguments.delete_profile, "is not found.")
+            print(f"{AWS_TEXT}", arguments.delete_profile, "is not found.")
 
         with open(json_profiles, 'w') as file:
             file.write(json.dumps(data, indent=4))
@@ -104,11 +105,11 @@ def main():
                 with open(arguments.profile_path, "w") as file:
                     file.write(f"# Current profile is {value['name']}\n[default]\naws_access_key = {value['aws_access_key']}\n" \
                                f"aws_secret_key = {value['aws_secret_key']}\n")
-                    print("The AWS profile with name", arguments.profile, "has been successfully uploaded.\n")
+                    print(f"{AWS_TEXT}", arguments.profile, "has been successfully uploaded.\n")
                 break
 
         else:
-            print("The AWS profile with name", arguments.profile, "is not found.\n")
+            print(f"{AWS_TEXT}", arguments.profile, "is not found.\n")
 
 if __name__ == "__main__":
     main()
