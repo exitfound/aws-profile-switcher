@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm AS BASE
+FROM python:3.12-slim-bookworm AS base
 
 WORKDIR /app
 
@@ -17,24 +17,22 @@ RUN apt-get update \
     && python3 -m PyInstaller --onefile --noconfirm --clean --name aps aws.py
 
 
-FROM ubuntu:22.04 AS FINAL
+FROM ubuntu:24.04 AS final
 
 ARG UID
 
 LABEL author="Ivan Medaev" \
-      language="python" \
-      tool="asp" \
-      version="3.11"
+    language="python" \
+    tool="aps" \
+    version="3.12"
 
 ENV ID=${UID}
-ENV USER=awstool
-ENV GROUP=awstool
+ENV USER=ubuntu
+ENV GROUP=ubuntu
 
 WORKDIR /app
 
-RUN groupadd -g ${ID} ${GROUP} && \
-    useradd -r -m -u ${ID} -g ${GROUP} ${USER} && \
-    mkdir -p /home/${USER}/.aws && \
+RUN mkdir -p /home/${USER}/.aws && \
     chown -R ${USER}:${GROUP} /app /home/${USER}/.aws/
 
 COPY --from=base --chown=${USER}:${GROUP} /app/dist/aps .
